@@ -106,8 +106,8 @@ class LocalizationVisualizer:
     def scan_callback(self, msg):
         if self.EKF:
             self.scans.append((msg.header.stamp,
-                               np.array([i*msg.angle_increment + msg.angle_min for i in range(len(msg.ranges))]),
-                               np.array(msg.ranges)))
+                            np.array([i*msg.angle_increment + msg.angle_min for i in range(len(msg.ranges))]),
+                            np.array(msg.ranges)))
 
     def control_callback(self, msg):
         if self.EKF:
@@ -143,6 +143,7 @@ class LocalizationVisualizer:
         x0 = np.array([self.latest_pose.position.x,
                        self.latest_pose.position.y,
                        get_yaw_from_quaternion(self.latest_pose.orientation)])
+
         self.EKF_time = self.latest_pose_time
         if self.params.mc:
             x0s = np.tile(np.expand_dims(x0, 0), (self.params.num_particles, 1))
@@ -161,6 +162,8 @@ class LocalizationVisualizer:
             if not self.scans:
                 rate.sleep()
                 continue
+
+
 
             while self.controls and self.controls[0][0] <= self.scans[0][0]:
                 next_timestep, next_control = self.controls.popleft()

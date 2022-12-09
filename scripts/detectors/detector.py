@@ -159,11 +159,13 @@ class Detector:
 
         ########## Code starts here ##########
         # TODO: Compute x, y, z.
-        x = 0.
-        y = 0.
-        z = 1.
+        x_hat = (u - self.cx)/self.fx
+        y_hat = (v - self.cy)/self.fy
+        norm = np.linalg.norm([x_hat, y_hat, 1])
+        x = x_hat/norm
+        y = y_hat/norm
+        z = 1/norm
         ########## Code ends here ##########
-
         return x, y, z
 
     def estimate_distance(self, thetaleft, thetaright, ranges):
@@ -258,10 +260,12 @@ class Detector:
 
         ########## Code starts here ##########
         # TODO: Extract camera intrinsic parameters.
-        self.cx = 0.
-        self.cy = 0.
-        self.fx = 1.
-        self.fy = 1.
+        K = msg.K
+        self.cx = K[2]
+        self.cy = K[5]
+        self.fx = K[0]
+        self.fy = K[4]
+        rospy.loginfo(K)
         ########## Code ends here ##########
 
     def laser_callback(self, msg):

@@ -18,7 +18,6 @@ class Mode(Enum):
     NAV = 5
     MANUAL = 6
 
-
 class SupervisorParams:
 
     def __init__(self, verbose=False):
@@ -97,11 +96,11 @@ class Supervisor:
         self.trans_listener = tf.TransformListener()
 
         # If using rviz, we can subscribe to nav goal click
-        if self.params.rviz:
+        """if self.params.rviz:
             rospy.Subscriber('/move_base_simple/goal', PoseStamped, self.rviz_goal_callback)
-        else:
-            self.x_g, self.y_g, self.theta_g = 1.5, -4., 0.
-            self.mode = Mode.NAV
+        else:"""
+        self.x_g, self.y_g, self.theta_g = 1.5, -4., 0.
+        self.mode = Mode.NAV
         
 
     ########## SUBSCRIBER CALLBACKS ##########
@@ -259,11 +258,13 @@ class Supervisor:
 
         elif self.mode == Mode.STOP:
             # At a stop sign
-            self.nav_to_pose()
+            if self.has_stopped():
+                self.init_crossing()
 
         elif self.mode == Mode.CROSS:
             # Crossing an intersection
-            self.nav_to_pose()
+            if self.has_crossed():
+                self.mode = Mode.POSE
 
         elif self.mode == Mode.NAV:
             if self.close_to(self.x_g, self.y_g, self.theta_g):
