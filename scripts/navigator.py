@@ -9,7 +9,7 @@ import numpy as np
 from numpy import linalg
 from utils.utils import wrapToPi
 from utils.grids import StochOccupancyGrid2D
-from planners import AStar, compute_smoothed_traj
+from planners import AStar, RRT, compute_smoothed_traj
 import scipy.interpolate
 import matplotlib.pyplot as plt
 from controllers import PoseController, TrajectoryTracker, HeadingController
@@ -54,7 +54,7 @@ class Navigator:
         self.map_resolution = 0
         self.map_origin = [0, 0]
         self.map_probs = []
-        self.occupancy = None
+        self.occupancy = None   
         self.occupancy_updated = False
 
         # plan parameters
@@ -78,8 +78,8 @@ class Navigator:
 
         # threshold at which navigator switches from trajectory to pose control
         self.near_thresh = 0.2
-        self.at_thresh = 0.02
-        self.at_thresh_theta = 0.05
+        self.at_thresh = 0.05 #default 0.02
+        self.at_thresh_theta = 0.1 #default 0.05
 
         # trajectory smoothing
         self.spline_alpha = 0.15

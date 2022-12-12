@@ -146,6 +146,7 @@ class Supervisor:
                 return
         self.animals_to_rescue = msg.data
         rospy.loginfo(f"Saving animals: {msg.data}")
+        self.navigate_to_next_animal()
 
     def navigate_to_next_animal(self):
         dists = [np.linalg.norm([self.x, self.y], [self.animals_discovered[name][0], self.animals_discovered[name][1]]) for name in self.animals_to_rescue]
