@@ -27,7 +27,7 @@ PATH_TO_LABELS = os.path.join(
 # False will use a very simple color thresholding to detect stop signs only
 USE_PYTORCH = True
 # minimum score for positive detection
-MIN_SCORE = 0.5
+MIN_SCORE = 0.66
 
 
 def load_object_labels(filename):

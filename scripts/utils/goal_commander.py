@@ -50,6 +50,7 @@ class GoalPoseCommander:
             pose_g_msg.y = self.y_g
             pose_g_msg.theta = self.theta_g
             self.nav_goal_publisher.publish(pose_g_msg)
+            rospy.loginfo("Sent goal")
         
     def loop(self):
         rate = rospy.Rate(10)

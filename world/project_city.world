@@ -61,6 +61,301 @@
       </link>
     </model>
 
+    <model name='cat_box'>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://cat_box/meshes/cat_box.dae</uri>
+              <scale>.1 .1 .1</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode>
+                <mu>0.2</mu>
+                <mu2>0.2</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://cat_box/meshes/cat_box.dae</uri>
+              <scale>.1 .1 .1</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://cat_box/materials/scripts</uri>
+              <uri>model://cat_box/materials/textures</uri>
+              <name>CatBox/Diffuse</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <inertial>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+          <mass>1</mass>
+        </inertial>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+      </link>
+      <pose frame=''>3.55 2.9 0.5 0.0 0.0 3.14159</pose>
+    </model>
+
+    <model name='dog_box'>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://dog_box/meshes/dog_box.dae</uri>
+              <scale>.1 .1 .1</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode>
+                <mu>0.2</mu>
+                <mu2>0.2</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://dog_box/meshes/dog_box.dae</uri>
+              <scale>.1 .1 .1</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://dog_box/materials/scripts</uri>
+              <uri>model://dog_box/materials/textures</uri>
+              <name>CatBox/Diffuse</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <inertial>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+          <mass>1</mass>
+        </inertial>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+      </link>
+      <pose frame=''>2.55 2.9 0.5 0.0 0.0 3.14159</pose>
+    </model>
+
+    <model name='bird_box'>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://bird_box/meshes/bird_box.dae</uri>
+              <scale>.1 .1 .1</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode>
+                <mu>0.2</mu>
+                <mu2>0.2</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://bird_box/meshes/bird_box.dae</uri>
+              <scale>.1 .1 .1</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://bird_box/materials/scripts</uri>
+              <uri>model://bird_box/materials/textures</uri>
+              <name>CatBox/Diffuse</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <inertial>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+          <mass>1</mass>
+        </inertial>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+      </link>
+      <pose frame=''>1.55 2.9 0.5 0.0 0.0 3.14159</pose>
+    </model>
+
+    <model name='horse_box'>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://horse_box/meshes/horse_box.dae</uri>
+              <scale>.1 .1 .1</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode>
+                <mu>0.2</mu>
+                <mu2>0.2</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://horse_box/meshes/horse_box.dae</uri>
+              <scale>.1 .1 .1</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://horse_box/materials/scripts</uri>
+              <uri>model://horse_box/materials/textures</uri>
+              <name>CatBox/Diffuse</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <inertial>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+          <mass>1</mass>
+        </inertial>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+      </link>
+      <pose frame=''>0.55 2.9 0.5 0.0 0.0 3.14159</pose>
+    </model>
+
+    <model name='elephant_box'>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://elephant_box/meshes/elephant_box.dae</uri>
+              <scale>.1 .1 .1</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode>
+                <mu>0.2</mu>
+                <mu2>0.2</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://elephant_box/meshes/elephant_box.dae</uri>
+              <scale>.1 .1 .1</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://elephant_box/materials/scripts</uri>
+              <uri>model://elephant_box/materials/textures</uri>
+              <name>CatBox/Diffuse</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <inertial>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+          <mass>1</mass>
+        </inertial>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+      </link>
+      <pose frame=''>5.55 2.9 0.5 0.0 0.0 3.14159</pose>
+    </model>
+
     <model name='wall_0'>
       <static>1</static>
       <link name='link'>
@@ -789,7 +1084,6 @@
       </link>
       <pose frame=''>2.61620523241 1.52400304801 0 0 0 1.57079632679</pose>
     </model>
-
 
     
     <model name='Stop Sign'>

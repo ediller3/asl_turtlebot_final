@@ -3,7 +3,8 @@
 from enum import Enum
 
 import rospy
-from asl_turtlebot.msg import DetectedObject
+import numpy as np
+from asl_turtlebot.msg import DetectedObject, DetectedObjectList, StringArray
 from gazebo_msgs.msg import ModelStates
 from geometry_msgs.msg import Twist, PoseArray, Pose2D, PoseStamped
 from std_msgs.msg import Float32MultiArray, String
@@ -74,6 +75,17 @@ class Supervisor:
         self.mode = Mode.NAV
         self.prev_mode = None  # For printing purposes
 
+        # Keep track of discovered & rescued animals
+        self.animals_discovered = {}
+        self.animals_to_rescue = []
+        self.animal_types = [
+            "dog",
+            "cat",
+            "bird",
+            "horse",
+            "elephant"
+        ]
+
         ########## PUBLISHERS ##########
 
         # Command pose for controller
@@ -82,13 +94,21 @@ class Supervisor:
         # Command vel (used for idling)
         self.cmd_vel_publisher = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
 
+        # New goal publisher
+        self.nav_goal_publisher = rospy.Publisher('/cmd_nav', Pose2D, queue_size=10)
+
         ########## SUBSCRIBERS ##########
 
         # Stop sign detector
-        rospy.Subscriber('/detector/stop_sign', DetectedObject, self.stop_sign_detected_callback)
+        rospy.Subscriber('/detector/stop_sign', DetectedObjectList, self.stop_sign_detected_callback)
 
         # High-level navigation pose
         rospy.Subscriber('/nav_pose', Pose2D, self.nav_pose_callback)
+
+        # Process new found animals
+        rospy.Subscriber('/detector/objects', DetectedObjectList, self.object_detected_callback)
+        rospy.Subscriber('/print_animals', String, self.print_discovered_objects_callback)
+        rospy.Subscriber('/rescue_animals', StringArray, self.initiate_animal_rescue_callback)
 
         # If using gazebo, we have access to perfect state
         if self.params.use_gazebo:
@@ -104,6 +124,40 @@ class Supervisor:
         
 
     ########## SUBSCRIBER CALLBACKS ##########
+
+    def object_detected_callback(self, msg):
+        valid_msgs = [m for m in msg.ob_msgs if m.name in self.animal_types and m.name not in self.animals_discovered]
+        for m in valid_msgs:
+            theta_avg = (m.thetaleft + m.thetaright) / 2
+            x = self.x + np.sin(theta_avg) * m.distance
+            y = self.y + np.cos(theta_avg) * m.distance
+            self.animals_discovered[m.name] = (x, y, self.theta)
+            rospy.loginfo(f"Discovered animal: {m.name} @ {self.animals_discovered[m.name]} (cur pos: {self.x}, {self.y}, {self.theta})")
+
+    def print_discovered_objects_callback(self, msg):
+        for name, coords in self.animals_discovered.items():
+            rospy.loginfo(f"Discovered animal: {name} @ {coords}")
+
+    def initiate_animal_rescue_callback(self, msg):
+        rospy.loginfo(f"received animals to rescue: {msg.data}")
+        for animal in msg.data:
+            if animal not in self.animals_discovered:
+                rospy.loginfo(f"Have not discovered {animal} yet. Aborting rescue.")
+                return
+        self.animals_to_rescue = msg.data
+        rospy.loginfo(f"Saving animals: {msg.data}")
+
+    def navigate_to_next_animal(self):
+        dists = [np.linalg.norm([self.x, self.y], [self.animals_discovered[name][0], self.animals_discovered[name][1]]) for name in self.animals_to_rescue]
+        min_idx = dists.index(min(dists))
+        to_rescue_coords = self.animals_discovered[self.animals_to_rescue[min_idx]]
+        pose_g_msg = Pose2D()
+        pose_g_msg.x = to_rescue_coords[0]
+        pose_g_msg.y = to_rescue_coords[1]
+        pose_g_msg.theta = to_rescue_coords[2]
+        self.nav_goal_publisher.publish(pose_g_msg)
+        self.animals_to_rescue.pop(min_idx)
+
 
     def gazebo_callback(self, msg):
         if "turtlebot3_burger" not in msg.name:
@@ -247,6 +301,8 @@ class Supervisor:
 
         if self.mode == Mode.IDLE:
             # Send zero velocity
+            if len(self.animals_to_rescue) > 0:
+                self.navigate_to_next_animal()
             self.stay_idle()
 
         elif self.mode == Mode.POSE:
