@@ -1,8 +1,4 @@
-# asl_turtlebot_final
-
-This contains a _starting point_ for your final project. Below are _brief_
-descriptions of the code. You are strongly encouraged to take a closer look into
-the code for more details of how and what the code does.
+# Robot Autonomy (CS237A) Final Project
 
 **File Descriptions:**
 
