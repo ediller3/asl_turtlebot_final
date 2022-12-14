@@ -3,17 +3,18 @@
 import rospy
 from nav_msgs.msg import OccupancyGrid, MapMetaData, Path
 from geometry_msgs.msg import Twist, Pose2D, PoseStamped
-from std_msgs.msg import String
+from std_msgs.msg import String, Int32
 import tf
 import numpy as np
 from numpy import linalg
 from utils.utils import wrapToPi
 from utils.grids import StochOccupancyGrid2D
-from planners import AStar, RRT, compute_smoothed_traj
+from planners import AStar, compute_smoothed_traj
 import scipy.interpolate
 import matplotlib.pyplot as plt
 from controllers import PoseController, TrajectoryTracker, HeadingController
 from enum import Enum
+
 
 from dynamic_reconfigure.server import Server
 from asl_turtlebot.cfg import NavigatorConfig
@@ -113,6 +114,8 @@ class Navigator:
             "/cmd_smoothed_path_rejected", Path, queue_size=10
         )
         self.nav_vel_pub = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
+        self.pos_pub = rospy.Publisher("/cur_pos", Pose2D, queue_size=10)
+        self.state_change_pub = rospy.Publisher("/state_change", Int32, queue_size=10)
 
         self.trans_listener = tf.TransformListener()
 
@@ -177,7 +180,7 @@ class Navigator:
                 7,
                 self.map_probs,
             )
-            if self.x_g is not None:
+            if self.x_g is not None and self.mode is not Mode.PARK:
                 # if we have a goal to plan to, replan
                 rospy.loginfo("replanning because of new map")
                 self.replan()  # new map, need to replan
@@ -236,6 +239,9 @@ class Navigator:
     def switch_mode(self, new_mode):
         rospy.loginfo("Switching from %s -> %s", self.mode, new_mode)
         self.mode = new_mode
+        msg = Int32()
+        msg.data = self.mode.value
+        self.state_change_pub.publish(msg)
 
     def publish_planned_path(self, path, publisher):
         # publish planned plan for visualization
@@ -290,6 +296,13 @@ class Navigator:
         cmd_vel.linear.x = V
         cmd_vel.angular.z = om
         self.nav_vel_pub.publish(cmd_vel)
+
+    def publish_position(self):
+        msg = Pose2D()
+        msg.x = self.x
+        msg.y = self.y
+        msg.theta = self.theta
+        self.pos_pub.publish(msg)
 
     def get_current_plan_time(self):
         t = (rospy.get_rostime() - self.current_plan_start_time).to_sec()
@@ -443,6 +456,7 @@ class Navigator:
                     self.switch_mode(Mode.IDLE)
 
             self.publish_control()
+            self.publish_position()
             rate.sleep()
 
 
