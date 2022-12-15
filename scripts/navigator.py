@@ -453,6 +453,10 @@ class Navigator:
                     self.x_g = None
                     self.y_g = None
                     self.theta_g = None
+                    rospy.loginfo("State reached.")
+                    rospy.loginfo("x: " + str(self.x))
+                    rospy.loginfo("y: " + str(self.y))
+                    rospy.loginfo("theta: " + str(self.theta))
                     self.switch_mode(Mode.IDLE)
 
             self.publish_control()
