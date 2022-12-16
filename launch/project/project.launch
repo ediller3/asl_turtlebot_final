@@ -2,7 +2,7 @@
   <arg name="sim" default="true"/>
 
   <include file="$(find asl_turtlebot)/launch/root.launch">
-    <arg name="world" value="project_city_final" />
+    <arg name="world" value="project_city_bright" />
     <arg name="x_pos" default="3.15"/>
     <arg name="y_pos" default="1.6"/>
     <arg name="z_pos" default="0.0"/>
@@ -12,4 +12,7 @@
     <arg name="detector" value="detector_mobilenet.py" />
   </include>
   <node pkg="asl_turtlebot" type="navigator.py" name="navigator" output="screen" />
+  <node pkg="asl_turtlebot" type="navsmach.py" name="nav_smach" output="screen" />
+  <node pkg="asl_turtlebot" type="supsmach.py" name="sup_smach" output="screen" />
+  <node pkg="smach_viewer" type="smach_viewer.py" name="smach_viewer" output="screen" />
 </launch>

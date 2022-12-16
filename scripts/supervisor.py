@@ -13,6 +13,7 @@ import tf
 
 class Mode(Enum):
     """State machine modes. Feel free to change."""
+    AUTO_EXPLORE = 0
     DISCOVER = 1
     RESCUE = 2
     RETURN = 3
@@ -34,26 +35,28 @@ class Supervisor:
         # Keep track of discovered & rescued animals
         self.animals_discovered = {}
         self.animals_to_rescue = []
-        self.pos_g = None
         self.animal_types = [
             "dog",
             "cat",
-            "bird",
+            "giraffe",
             "horse",
             "elephant"
         ]
 
         self.start_time = rospy.get_rostime()
 
-        self.explore_points = [(3.4233358681643704, 2.0164839470015576, 0.0),
+        self.waypoints =    [  (3.4233358681643704, 2.0164839470015576, 0.0), #cat
                                (2.5556310905569024, 2.8031463340039773, 3.0984228736087127),
-                               
                                (0.7729086841574924, 2.8022618945243964, -2.2793409282702535),
+                               (0.3196694884880853, 1.755398573112974, 0.12193387175107573),
+                               (0.5488329194855261, 1.6921026397813366, 1.4297736114376145), #dog
+                               (0.2879257437502593, 1.7256991482180148, -1.5415648632689034),
+                               (2.307002531909424, 1.9074444990466874, 3.1008738823655455),
+                               (2.4836124329990086, 0.3763751459363931, -1.2679121895410606), 
+                               (0.6120595033067794, 0.3910181634118649, -2.8731482725221955) 
+                            ]
 
-                               (0.24557927944076685, 1.889421954854304, 0.0),
-
-
-                               ]
+        self.pos_g = None 
 
         ########## PUBLISHERS ##########
 
@@ -63,6 +66,11 @@ class Supervisor:
 
         # Goal nav publisher
         self.nav_goal_publisher = rospy.Publisher('/cmd_nav', Pose2D, queue_size=10)
+
+        #animal announcer publisher
+        self.animal_announcer_publisher = rospy.Publisher('/animal_announcer', String, queue_size=10) 
+
+        self.state_change_pub = rospy.Publisher("/sup_state_change", Int32, queue_size=10)
 
         ########## SUBSCRIBERS ##########
 
@@ -74,26 +82,47 @@ class Supervisor:
         # Position callback
         rospy.Subscriber('/cur_pos', Pose2D, self.current_position_callback)
         rospy.Subscriber("/state_change", Int32, self.state_change_callback)
-        
+
+    def switchMode(self, new_mode):
+        rospy.loginfo("Switching from %s -> %s", self.mode, new_mode)
+        self.mode = new_mode
+        msg = Int32()
+        msg.data = self.mode.value
+        self.state_change_pub.publish(msg)
 
     ########## SUBSCRIBER CALLBACKS ##########
 
     def state_change_callback(self, msg):
         if self.mode == Mode.DISCOVER:
-            return
+                return
         if msg.data != 0:
             return
         if np.linalg.norm(np.array([self.x - self.pos_g[0], self.y - self.pos_g[1]])) < self.near_thresh:
             if self.mode == Mode.RETURN:
-                self.mode = Mode.DISCOVER
+                self.switchMode(Mode.DISCOVER)
                 return
+
+            if self.mode == Mode.AUTO_EXPLORE:
+                if len(self.waypoints) == 0:
+                    if len(self.animals_discovered) != 5:
+                        rospy.loginfo("Warning! Not all animals discovered. Manual discovery reccomended.")
+                        self.switchMode(Mode.DISCOVER)
+                        return
+                    else:
+                        rospy.loginfo("AUTO_EXPLORE succesful, all animals discovered.")
+                        self.switchMode(Mode.RETURN) #do we need to return after discovering all animals?
+                        return
+                else:
+                    self.navigate_to_next_waypoint()
+                    return
+            
             rospy.loginfo("Rescuing animal. Sleeping...")
             rospy.sleep(5)
             rospy.loginfo("Rescued animal!")
             if len(self.animals_to_rescue) == 0:
                 self.pos_g = self.origin
                 self.start_time = rospy.get_rostime()
-                self.mode = Mode.RETURN
+                self.switchMode(Mode.RETURN)
                 return
             else:
                 self.navigate_to_next_animal()
@@ -113,6 +142,16 @@ class Supervisor:
             marker_id = list(self.animals_discovered).index(m.name)
             self.delete_marker(marker_id)
             self.send_marker(m.name, marker_id, *self.animals_discovered[m.name][1])
+            if m.name == 'cat':
+                self.animal_announcer_publisher.publish("meow!")
+            elif m.name=='dog':
+                self.animal_announcer_publisher.publish("woof!")
+            elif m.name == 'horse':
+                self.animal_announcer_publisher.publish("nehh!")
+            elif m.name == 'bird':
+                self.animal_announcer_publisher.publish("tweet!")
+            elif m.name == "elephant":
+                self.animal_announcer_publisher.publish("thwamp!")
 
     def delete_marker(self, id):
         marker = Marker()
@@ -159,7 +198,7 @@ class Supervisor:
                 return
         self.animals_to_rescue = msg.data
         rospy.loginfo(f"Saving animals: {msg.data}")
-        self.mode = Mode.RESCUE
+        self.switchMode(Mode.RESCUE)
         self.navigate_to_next_animal()
 
     def navigate_to_next_animal(self):
@@ -167,6 +206,13 @@ class Supervisor:
         min_idx = dists.index(min(dists))
         self.pos_g = self.animals_discovered[self.animals_to_rescue[min_idx]][1]
         self.animals_to_rescue.pop(min_idx)
+        self.start_time = rospy.get_rostime()
+
+    def navigate_to_next_waypoint(self):
+        rospy.loginfo("Navigating to next waypoint: ")
+        rospy.loginfo(self.waypoints[0])
+        self.pos_g = self.waypoints[0]
+        self.waypoints.pop(0)
         self.start_time = rospy.get_rostime()
 
     def current_position_callback(self, msg):
@@ -213,7 +259,7 @@ class Supervisor:
 
         if self.mode == Mode.DISCOVER:
             pass
-        elif self.mode == Mode.RESCUE or self.mode == Mode.RETURN:
+        elif self.mode == Mode.AUTO_EXPLORE or self.mode == Mode.RESCUE or self.mode == Mode.RETURN:
             t = rospy.get_rostime()
             if (t - self.start_time).to_sec() < 2.0:
                 self.publish_goal_pose()

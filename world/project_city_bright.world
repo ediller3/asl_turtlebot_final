@@ -123,8 +123,8 @@
         <gravity>0</gravity>
         <enable_wind>0</enable_wind>
       </link>
-      <pose>3.64 2.0 0.2 0 0 0</pose>
-      <static>true</static>
+      <pose>3.64 2 0.2 0 -0 0</pose>
+      <static>1</static>
     </model>
     <model name='dog_box'>
       <link name='link'>
@@ -184,8 +184,8 @@
         <gravity>0</gravity>
         <enable_wind>0</enable_wind>
       </link>
-      <pose>0.768079 1.85011 0.2 0 0 0</pose>
-      <static>true</static>
+      <pose>0.768079 1.85011 0.2 0 -0 0</pose>
+      <static>1</static>
     </model>
     <model name='bird_box'>
       <link name='link'>
@@ -245,8 +245,8 @@
         <gravity>0</gravity>
         <enable_wind>0</enable_wind>
       </link>
-      <pose>1.9019 1.86939 0.2 0 0 0</pose>
-      <static>true</static>
+      <pose>1.9019 1.86939 0.2 0 -0 0</pose>
+      <static>1</static>
     </model>
     <model name='horse_box'>
       <link name='link'>
@@ -306,8 +306,8 @@
         <gravity>0</gravity>
         <enable_wind>0</enable_wind>
       </link>
-      <pose>0.0748 0.200869 0.2 0 0</pose>
-      <static>true</static>
+      <pose>0.0748 0.200869 0.2 0 -0 0</pose>
+      <static>1</static>
     </model>
     <model name='elephant_box'>
       <link name='link'>
@@ -367,8 +367,8 @@
         <gravity>0</gravity>
         <enable_wind>0</enable_wind>
       </link>
-      <pose>2.6 0.000523 0.2 0 0</pose>
-      <static>true</static>
+      <pose>2.6 0.000523 0.2 0 -0 0</pose>
+      <static>1</static>
     </model>
     <model name='wall_0'>
       <static>1</static>
@@ -1545,7 +1545,7 @@
     </state>
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose frame=''>5 -5 2 0 0.275643 2.35619</pose>
+        <pose>3.19133 -3.8742 4.08894 0 0.725797 1.72818</pose>
         <view_controller>orbit</view_controller>
         <projection_type>perspective</projection_type>
       </camera>
@@ -1991,5 +1991,31 @@
       </plugin>
       <pose>3.15 1.6 0 0 -0 0</pose>
     </model>
+    <light name='user_point_light_0' type='point'>
+      <pose>1.90614 1.05618 1 0 -0 0</pose>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <attenuation>
+        <range>20</range>
+        <constant>0.5</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <cast_shadows>0</cast_shadows>
+      <direction>0 0 -1</direction>
+    </light>
+    <light name='user_point_light_1' type='point'>
+      <pose>2.69873 2.43431 1 0 -0 0</pose>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <attenuation>
+        <range>20</range>
+        <constant>0.5</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <cast_shadows>0</cast_shadows>
+      <direction>0 0 -1</direction>
+    </light>
   </world>
 </sdf>

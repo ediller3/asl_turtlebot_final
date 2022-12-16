@@ -4,6 +4,8 @@ import rospy
 from nav_msgs.msg import OccupancyGrid, MapMetaData, Path
 from geometry_msgs.msg import Twist, Pose2D, PoseStamped
 from std_msgs.msg import String, Int32
+from visualization_msgs.msg import Marker
+from sensor_msgs.msg import LaserScan
 import tf
 import numpy as np
 from numpy import linalg
@@ -68,10 +70,10 @@ class Navigator:
         self.plan_start = [0.0, 0.0]
 
         # Robot limits
-        self.v_max = 0.2  # maximum velocity
-        self.om_max = 0.4  # maximum angular velocity
+        self.v_max = 0.5 # maximum velocity (default 0.2)
+        self.om_max = 1  # maximum angular velocity (default 0.5)
 
-        self.v_des = 0.12  # desired cruising velocity
+        self.v_des = 0.25  # desired cruising velocity (Default 0.12)
         self.theta_start_thresh = 0.05  # threshold in theta to start moving forward when path-following
         self.start_pos_thresh = (
             0.2  # threshold to be far enough into the plan to recompute it
@@ -117,15 +119,79 @@ class Navigator:
         self.pos_pub = rospy.Publisher("/cur_pos", Pose2D, queue_size=10)
         self.state_change_pub = rospy.Publisher("/state_change", Int32, queue_size=10)
 
+        self.collision_pub = rospy.Publisher('/marker_topic', Marker, queue_size=10)
+
+
         self.trans_listener = tf.TransformListener()
 
         self.cfg_srv = Server(NavigatorConfig, self.dyn_cfg_callback)
+
+        self.collisionActive = False
+        self.x_col = None
+        self.y_col = None
+        self.numCollisions = 0
 
         rospy.Subscriber("/map", OccupancyGrid, self.map_callback)
         rospy.Subscriber("/map_metadata", MapMetaData, self.map_md_callback)
         rospy.Subscriber("/cmd_nav", Pose2D, self.cmd_nav_callback)
 
+        rospy.Subscriber('/scan', LaserScan, self.laser_callback)
+
         print("finished init")
+
+    def laser_callback(self, msg):
+        laser_ranges = msg.ranges
+        min_range = min(laser_ranges)
+        if min_range < 0.11 and self.mode != Mode.IDLE and not self.collisionActive:
+            rospy.loginfo("Collision detected!")
+            rospy.loginfo(min_range)
+            self.switch_mode(Mode.IDLE)
+            self.collisionActive = True
+            self.x_col = self.x
+            self.y_col = self.y
+            self.send_marker(self.numCollisions, 1.0, 0)
+            self.x_g = None
+            self.y_g = None
+            self.theta_g = None
+        elif min_range > 0.15 and self.collisionActive:
+            rospy.loginfo("Collision avoided. Detection protocol reset.")
+            self.delete_marker(self.numCollisions)
+            self.send_marker(self.numCollisions, 0, 1.0)
+            self.numCollisions += 1
+            self.collisionActive = False
+
+    def delete_marker(self, id):
+        marker = Marker()
+
+        marker.header.frame_id = "map"
+        marker.header.stamp = rospy.Time()
+        marker.id = id
+        marker.action = 2
+        self.collision_pub.publish(marker)
+            
+    def send_marker(self, marker_id, r, g):
+        marker = Marker()
+
+        marker.header.frame_id = "map"
+        marker.header.stamp = rospy.Time()
+        marker.id = marker_id
+        marker.type = 3
+        marker.pose.position.x = self.x_col
+        marker.pose.position.y = self.y_col
+        marker.pose.position.z = 0
+        marker.pose.orientation.x = 0.0
+        marker.pose.orientation.y = 0.0
+        marker.pose.orientation.z = 0.0
+        marker.pose.orientation.w = 1.0
+        marker.scale.x = 0.1
+        marker.scale.y = 0.1
+        marker.scale.z = 0.1
+        marker.color.r = r
+        marker.color.g = g
+        marker.color.b = 0
+        marker.color.a = 0.6
+        self.collision_pub.publish(marker)
+
 
     def dyn_cfg_callback(self, config, level):
         rospy.loginfo(
@@ -177,7 +243,7 @@ class Navigator:
                 self.map_height,
                 self.map_origin[0],
                 self.map_origin[1],
-                7,
+                7, #default = 7
                 self.map_probs,
             )
             if self.x_g is not None and self.mode is not Mode.PARK:
