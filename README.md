@@ -1,7 +1,5 @@
 # Robot Autonomy (CS237A) Final Project
 
-**File Descriptions:**
-
 **Gazebo Simulation Files:**
 ----------------------
 
