@@ -1,5 +1,10 @@
 # Robot Autonomy (CS237A) Final Project
 
+'''
+roslaunch asl_turtlebot project.launch
+rosrun asl_turtlebot supervisor.py
+'''
+
 **Gazebo Simulation Files:**
 ----------------------
 
