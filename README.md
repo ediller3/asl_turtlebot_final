@@ -33,13 +33,12 @@ Visualizing highest confidence animal location estimates in RVIZ:
 
 <img width="545" alt="Screen Shot 2022-12-15 at 4 35 18 PM" src="https://user-images.githubusercontent.com/90282643/207995374-bb499b77-aa06-43fb-b340-bc7ef58b5ef4.png">
 
-**Gazebo Simulation Files:**
+**File Descriptions:**
 ----------------------
+**Gazebo Simullation Files:**
 `world/project_city.world`: Defines 3D model of rough, tentative
 representation of the final project environment.
 
-**Turtlebot Files:**
-----------------------
 **Launch Files:**
 
 `launch/root.launch`: The main configurable launch file on top of
@@ -76,7 +75,8 @@ the pose controller from HW1 when close to the goal.
 function.
 
 
-**Tensorflow Models:**
+**Tesnsorflow Models:**
+----------------------
 
 The `.pb` files in the `tfmodels` folder are "frozen" neural network models, and
 contain both the structure and the weights of pretrained networks.
