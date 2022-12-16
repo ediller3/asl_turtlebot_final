@@ -35,7 +35,8 @@ Visualizing highest confidence animal location estimates in RVIZ:
 
 **File Descriptions:**
 ----------------------
-**Gazebo Simullation Files:**
+**Gazebo Simulation Files:**
+
 `world/project_city.world`: Defines 3D model of rough, tentative
 representation of the final project environment.
 
@@ -67,15 +68,16 @@ confidence for detected objects.
 occupancy grids. grids.py functions/classes are used by scripts/navigator.py.
 
 `scripts/navigator.py`: Node that manages point to point robot navigation, uses
-your A\* implementation (HW2) in an MPC framework along with cubic spline
+ A\* implementation in an MPC framework along with cubic spline
 interpolation and the differential flatness controller (from HW1), switching to
-the pose controller from HW1 when close to the goal.
+the pose controller when close to the goal.
+
+`scripts/supervisor.py`: Node that manages high level mission planning and animal rescue.
 
 `scripts/utils/utils.py`: Utility functions. Currently contains a wrapToPi
 function.
 
-
-**Tesnsorflow Models:**
+**Tensorflow Models:**
 ----------------------
 
 The `.pb` files in the `tfmodels` folder are "frozen" neural network models, and
