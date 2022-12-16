@@ -1,9 +1,14 @@
 # Robot Autonomy (CS237A) Final Project
 
-'''
+To run the project simulation in Gazebo and the command center visualization in RVIZ:
+```
 roslaunch asl_turtlebot project.launch
+```
+
+To run the supervisor node (detection network and mission planning):
+```
 rosrun asl_turtlebot supervisor.py
-'''
+```
 
 **Gazebo Simulation Files:**
 ----------------------
